@@ -114,9 +114,9 @@ def verify_email(token):
         user.is_active = True
         user.verification_token = None  
         db.session.commit()
-        return redirect(f"http://localhost:3000/verified-email?token={token}&status=success")
+        return redirect(f"https://ang-tipo-kong-kwento.onrender.com/verified-email?token={token}&status=success")
     else:
-        return redirect(f"http://localhost:3000/verified-email?status=failure")
+        return redirect(f"https://ang-tipo-kong-kwento.onrender.com/verified-email?status=failure")
 
 
 # SEND MESSAGE FROM CONTACT US TO EMAIL
@@ -362,7 +362,7 @@ def forgot_password():
         email_address = Config.MAIL_USERNAME 
         app_password = Config.MAIL_PASSWORD 
 
-        reset_link = f"http://localhost:3000/reset-password/{reset_token}"
+        reset_link = f"https://ang-tipo-kong-kwento.onrender.com/reset-password/{reset_token}"
 
         subject = "Reset Password"
         body = f"Click the link to reset your password: {reset_link}"
