@@ -497,6 +497,8 @@ def generate_random_story():
         if story:
             end_time = time.time()
             logging.info("RANDOM STORY WAS SUCCESSFULLY GENERATED.")
+            logging.info(f"STORY: {story}")
+
             logging.info(f"STORY GENERATION TOOK {end_time - start_time} SECONDS")
 
             story_id = None
@@ -552,6 +554,7 @@ def generate_custom_story():
         if story:
             end_time = time.time()
             logging.info("CUSTOM STORY WAS SUCCESSFULLY GENERATED.")
+            logging.info(f"STORY: {story}")
             logging.info(f"STORY GENERATION TOOK {end_time - start_time} SECONDS")
 
             # Save the story for authenticated user

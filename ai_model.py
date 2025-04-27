@@ -1,8 +1,8 @@
-import requests
-import logging
+import requests, logging
 from config import Config  
 
 
+logging.basicConfig(level=logging.INFO)
 HF_API_URL = Config.HF_API_URL
 HF_API_TOKEN = Config.HF_API_TOKEN
 
@@ -18,13 +18,11 @@ def generate_from_huggingface_api(title, genre, length):
     payload = {
         "inputs": prompt,
         "parameters": {
-            "do_sample": True,
             "max_length": 700,
             "num_return_sequences": 1,
             "top_k": 50,
             "top_p": 0.95,
-            "temperature": 0.7, 
-            "stopping_strings": ["[END]"]
+            "temperature": 0.7
         }
     }
 
@@ -34,6 +32,8 @@ def generate_from_huggingface_api(title, genre, length):
         result = response.json()
         
         story = result[0].get('generated_text')
+        logging.info(f"Raw story: {story}")
+
         
         story = story.split("[SEP]")[-1].strip() 
         story = story.split('[END]')[0].strip() 
