@@ -13,7 +13,8 @@ import requests, logging, time, random, string, smtplib, os, re, csv, uuid
 
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+# CORS(app, supports_credentials=True)
+CORS(app, origins="https://ang-tipo-kong-kwento.onrender.com", supports_credentials=True)
 app.config.from_object(Config)
 db.init_app(app)
 app.config['JWT_SECRET_KEY'] = Config.JWT_SECRET_KEY
