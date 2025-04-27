@@ -1,0 +1,12 @@
+flask
+Flask-Cors 
+requests
+psycopg2
+psycopg2-binary
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Mail
+werkzeug
+python-dotenv
+PyJWT
+Flask-JWT-Extended
