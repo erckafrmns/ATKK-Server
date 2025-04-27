@@ -7,6 +7,7 @@ HF_API_URL = Config.HF_API_URL
 HF_API_TOKEN = Config.HF_API_TOKEN
 
 headers = {
+    "Accept" : "application/json",
     "Authorization": f"Bearer {HF_API_TOKEN}",
     "Content-Type": "application/json"
 }
