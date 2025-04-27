@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 from db_models import db, User, Story
 from config import Config
 import requests, logging, time, random, string, smtplib, os, re, csv, uuid
-
+from ai_model import generate_from_huggingface_api
 
 
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +21,6 @@ app.config['JWT_SECRET_KEY'] = Config.JWT_SECRET_KEY
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
-MODEL_SERVICE_URL = "http://model:5001"
 
 # CREATE TABLES
 with app.app_context():
@@ -492,30 +491,25 @@ def generate_random_story():
             logging.error(f"Failed to read or process titles.csv: {csv_error}")
             return jsonify({"error": "Failed to read titles.csv"}), 500
 
-        # Request to model service
-        response = requests.post(
-            f"{MODEL_SERVICE_URL}/model-generate-story",
-            json={"title": title, "genre": genre, "length": length},
-        )
-
-        if response.status_code == 200:
-            story = response.json().get("story", "No story generated.")
+        # Use Hugging Face model to generate the story
+        story = generate_from_huggingface_api(title, genre, length)
+        
+        if story:
             end_time = time.time()
             logging.info("RANDOM STORY WAS SUCCESSFULLY GENERATED.")
             logging.info(f"STORY GENERATION TOOK {end_time - start_time} SECONDS")
 
             story_id = None
             if user_id:
-                story_id, status_code = save_user_story(user_id, title, genre, story)  # Now story_id is directly returned
+                story_id, status_code = save_user_story(user_id, title, genre, story)  # Save the generated story
                 logging.info(f"Save story response: {story_id}, Status code: {status_code}")
-
                 if status_code == 201:
                     logging.info(f"Story saved successfully for user {user_id}.")
                 else:
                     logging.error(f"Failed to save story for user {user_id}.")
             else:
                 story_id = generate_storyID()
- 
+
             return jsonify({
                 "story_id": story_id,
                 "title": title,
@@ -525,8 +519,8 @@ def generate_random_story():
             })
             
         else:
-            logging.error(f"FAILED TO GENERATE STORY. MODEL SERVICE RETURNED STATUS CODE: {response.status_code}")
-            return jsonify({"error": "Failed to generate story."}), response.status_code
+            logging.error(f"FAILED TO GENERATE STORY. Hugging Face API returned no story.")
+            return jsonify({"error": "Failed to generate story."}), 500
 
     except Exception as e:
         logging.error(f"ERROR GENERATING RANDOM STORY: {str(e)}")
@@ -552,19 +546,15 @@ def generate_custom_story():
         start_time = time.time() #TO TRACK GENERATION TIME
         logging.info(f"RECEIVED REQUEST FOR CUSTOM STORY: '{genre} - {length} - {title}'")
 
-        # REQUEST TO MODEL SERVICE
-        response = requests.post(
-            f"{MODEL_SERVICE_URL}/model-generate-story",
-            json={"title": title, "genre": genre, "length": length},
-        )
-
-        if response.status_code == 200:
-            story = response.json().get("story", "No story generated.")
+         # Use Hugging Face model to generate the story
+        story = generate_from_huggingface_api(title, genre, length)
+        
+        if story:
             end_time = time.time()
             logging.info("CUSTOM STORY WAS SUCCESSFULLY GENERATED.")
             logging.info(f"STORY GENERATION TOOK {end_time - start_time} SECONDS")
 
-            # SAVE STORY ACCORDINGLY
+            # Save the story for authenticated user
             story_id = None
             if user_id:
                 story_id, status_code = save_user_story(user_id, title, genre, story) 
@@ -576,11 +566,12 @@ def generate_custom_story():
                     logging.error(f"Failed to save story for user {user_id}.")
             else:
                 story_id = generate_storyID()
-            
+
             return jsonify({"story_id": story_id, "story": story})
+        
         else:
-            logging.error(f"FAILED TO GENERATE STORY. MODEL SERVICE RETURNED STATUS CODE: {response.status_code}")
-            return jsonify({"error": "Failed to generate story."}), response.status_code
+            logging.error(f"FAILED TO GENERATE STORY. Hugging Face API returned no story.")
+            return jsonify({"error": "Failed to generate story."}), 500
     
     except Exception as e:
         logging.error(f"ERROR GENERATING CUSTOM STORY: {str(e)}")

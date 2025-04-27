@@ -15,3 +15,5 @@ class Config:
     MAIL_USE_SSL = False
     MAIL_USERNAME = os.getenv('MAIL_USERNAME') 
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD') 
+    HF_API_URL = os.getenv('HF_API_URL')  
+    HF_API_TOKEN = os.getenv('HF_API_TOKEN')  
