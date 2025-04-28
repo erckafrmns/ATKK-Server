@@ -18,11 +18,17 @@ def generate_from_huggingface_api(title, genre, length):
     payload = {
         "inputs": prompt,
         "parameters": {
+            "do_sample": True,
             "max_length": 700,
             "num_return_sequences": 1,
             "top_k": 50,
             "top_p": 0.95,
-            "temperature": 0.7
+            "temperature": 0.7, 
+            "use_cache": False,
+            "skip_special_tokens": False,
+            "stop": ["[END]"],
+            "output_scores": True,
+            "decode": False
         }
     }
 
