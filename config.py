@@ -17,3 +17,4 @@ class Config:
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD') 
     HF_API_URL = os.getenv('HF_API_URL')  
     HF_API_TOKEN = os.getenv('HF_API_TOKEN')  
+    AI_API_KEY = os.getenv('AI_API_KEY')

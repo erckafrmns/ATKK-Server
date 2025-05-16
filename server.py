@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 from db_models import db, User, Story
 from config import Config
 import requests, logging, time, random, string, smtplib, os, re, csv, uuid
-from ai_model import generate_from_huggingface_api
+from ai_model import generate_from_huggingface_api, generate_from_openai_api
 
 
 logging.basicConfig(level=logging.INFO)
@@ -478,7 +478,7 @@ def generate_random_story():
 
         # Process CSV
         try:
-            with open('predef_titles.csv', mode='r') as csvfile:
+            with open('predef_data.csv', mode='r') as csvfile:
                 reader = csv.DictReader(csvfile)
                 rows = list(reader)
                 if not rows:
@@ -486,13 +486,14 @@ def generate_random_story():
                 selected_row = random.choice(rows)
                 title = selected_row['Title']
                 genre = selected_row['Genre']
+                theme = selected_row['Theme']
                 length = selected_row['Length']
         except Exception as csv_error:
             logging.error(f"Failed to read or process titles.csv: {csv_error}")
             return jsonify({"error": "Failed to read titles.csv"}), 500
 
         # Use Hugging Face model to generate the story
-        story = generate_from_huggingface_api(title, genre, length)
+        story = generate_from_openai_api(title, genre, theme, length)
         
         if story:
             end_time = time.time()
@@ -516,6 +517,7 @@ def generate_random_story():
                 "story_id": story_id,
                 "title": title,
                 "genre": genre,
+                "theme": theme,
                 "length": length,
                 "story": story,
             })
@@ -544,12 +546,13 @@ def generate_custom_story():
         data = request.get_json()
         title = data.get('title')
         genre = data.get('genre')
+        theme = data.get('theme')
         length = data.get('storyLength')
         start_time = time.time() #TO TRACK GENERATION TIME
-        logging.info(f"RECEIVED REQUEST FOR CUSTOM STORY: '{genre} - {length} - {title}'")
+        logging.info(f"RECEIVED REQUEST FOR CUSTOM STORY: '{genre} - {length} - {theme} - {title}'")
 
          # Use Hugging Face model to generate the story
-        story = generate_from_huggingface_api(title, genre, length)
+        story = generate_from_openai_api(title, genre, theme, length)
         
         if story:
             end_time = time.time()
