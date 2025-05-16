@@ -11,3 +11,4 @@ python-dotenv
 PyJWT
 Flask-JWT-Extended
 gunicorn
+openai
