@@ -54,19 +54,24 @@ def generate_from_huggingface_api(title, genre, theme, length):
         return None
 
 def generate_from_openai_api(title, genre, theme, length):
+    logging.info(f"Received request with title: {title}, genre: {genre}, theme: {theme}, length: {length}")
     system_prompt = (
-        "You are a helpful assistant that generates children stories in pure Tagalog. "
+        "You are a helpful assistant that generates simple children stories in pure Tagalog. "
         "Follow these rules strictly:\n"
-        "- If Length is 'Short', the story must be between 100 and 175 words.\n"
-        "- If Length is 'Long', the story must be between 180 and 400 words.\n"
+        "- If Length is 'Short', the story must be between 75 and 100 words.\n"
+        "- If Length is 'Long', the story must be between 101 and 250 words.\n"
         "- Do NOT include a title, explanation, or any extra text — return ONLY the story body.\n"
         "- The story must be written fluently and naturally in Tagalog, based on the given Genre, Theme, Title, and Length."
         "- The story must be appropriate for children, avoiding any adult themes or language.\n"
+        "- Make it look AI generated, and dumb it down a little."
     )
     user_prompt = f"Genre: {genre} Theme: {theme} Length: {length} Title: {title}"
     try:
+        logging.info(f"Calling API with prompt: {user_prompt}")
+        logging.info(f"System prompt: {system_prompt}")
         response = client.chat.completions.create(
             model="gpt-4o-mini",
+            store=True,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
